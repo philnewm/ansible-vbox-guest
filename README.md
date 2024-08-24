@@ -4,7 +4,7 @@
 
 This role is largely inspired by the [vbox-guest role](https://github.com/ezamriy/ansible-role-vbox_guest) used in the [Almalinux cloud-images](https://github.com/AlmaLinux/cloud-images/) repo.
 I modified it for my own [packer repo](https://github.com/philnewm/packer-templates).<br>
-The focus is on including Debian and Ubuntu in this setup sicne it was originally created only for RedHat based distros.
+The focus is on including Debian and Ubuntu in this setup since it was originally created only for RedHat based distros.
 
 
 
