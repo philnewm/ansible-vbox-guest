@@ -23,7 +23,7 @@ permissions:
   contents: read
 
 jobs:
-  ansible-role-template:
+  ansible-vbox-guest:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
