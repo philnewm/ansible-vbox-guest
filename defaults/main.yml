@@ -2,5 +2,9 @@
 
 # Variables for ansible-role-template
 
+# TODO get virtualbox version from ansible controller
+vbox_guest_download_url: https://download.virtualbox.org/virtualbox/7.0.20/VBoxGuestAdditions_7.0.20.iso
+vbox_additions_iso_path: "{{ ansible_env.HOME }}/{{ vbox_guest_download_url | basename }}"
+linux_installer_name: VBoxLinuxAdditions.run
 
 ...

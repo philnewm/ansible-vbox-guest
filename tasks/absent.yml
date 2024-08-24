@@ -1,7 +1,17 @@
 ---
 
-# Tasks to remove ansible-role-template
+# Tasks to remove vbox-guest
 
+- name: Check if the file exists
+  ansible.builtin.stat:
+    path: "/mnt/{{ linux_installer_name }}"
+  register: linux_installer_file_stat
+
+- name: Uninstall vbox-guest-additions
+  when: linux_installer_file_stat.stat.exists
+  become: true
+  ansible.builtin.command:
+    cmd: "sh /mnt/{{ linux_installer_name }} uninstall"
 
 - name: Remove unused dependencies
   become: true

@@ -6,10 +6,48 @@
   tasks:
     - name: Initialize role library
       ansible.builtin.include_role:
-        name: ansible-role-template
+        name: ansible-vbox-guest
         tasks_from: init
 
     - name: Gather package facts
       ansible.builtin.package_facts:
+
+    - name: Check VBoxGuestAdditions.iso removed
+      ansible.builtin.stat:
+        path: /home/vagrant/VBoxGuestAdditions.iso
+      register: local_iso
+      failed_when: local_iso.stat.exists
+
+    - name: Check /var/log/vboxadd-* logs deleted
+      ansible.builtin.find:
+        paths: /var/log
+        patterns: 'vboxadd-*'
+      register: vboxadd_find
+
+    - name: Check if VirtualBox kernel modules are loaded
+      ansible.builtin.shell:
+        cmd: |
+          set -eo pipefail
+          lsmod | grep -E '^vboxguest|^vboxsf'
+        executable: /bin/bash
+      register: vbox_modules
+      changed_when: false
+
+    # TODO error feedback needs improvement
+    - name: Test cleanup
+      ansible.builtin.assert:
+        that:
+          - not local_iso.stat.exists
+          - vboxadd_find.matched == 0
+        fail_msg: "Cleanup did either fail at the local iso and/or the logs"
+        quiet: true
+
+    - name: Test cleanup
+      ansible.builtin.assert:
+        that:
+          - "'vboxguest' in vbox_modules.stdout"
+          - "'vboxsf' in vbox_modules.stdout"
+        fail_msg: "Virtual box guest additions kernel modules aren't loaded."
+        quiet: true
 
 ...

@@ -3,8 +3,8 @@
 # tasks file for ansible-role-template
 
 
-- name: "Desired state is {{ ansible_role_template_state }}"
+- name: "Desired state is {{ vbox_guest_state }}"
   ansible.builtin.include_tasks:
-    file: "{{ ansible_role_template_state }}.yml"
+    file: "{{ vbox_guest_state }}.yml"
 
 ...

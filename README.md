@@ -1,22 +1,21 @@
-## Role Name
+## VBox-Guest
 
-[![ci-testing](https://github.com/philnewm/ansible-role-template/actions/workflows/molecule-ci.yml/badge.svg)](https://github.com/philnewm/ansible-role-template/actions/workflows/molecule-ci.yml)
+[![ci-testing](https://github.com/philnewm/ansible-vbox-guest/actions/workflows/molecule-ci.yml/badge.svg)](https://github.com/philnewm/ansible-vbox-guest/actions/workflows/molecule-ci.yml)
 
-Role description
+This role is largely inspired by the [vbox-guest role](https://github.com/ezamriy/ansible-role-vbox_guest) used in the [Almalinux cloud-images](https://github.com/AlmaLinux/cloud-images/) repo.
+I modified it for my own [packer repo](https://github.com/philnewm/packer-templates).<br>
+The focus is on including Debian and Ubuntu in this setup sicne it was originally created only for RedHat based distros.
 
 
 
-This role includes a full vagrant based molecule testing setup at `extensions/molecule/default`
+This role includes a full vagrant based molecule testing setup at `extensions/molecule/default`.<br>
+The molecule setup currently only includes debian as a vagrant box for testing.
 
 # Structure
 
 ```
 📦 ansible-role-template
  ┣ 📂 defaults
- ┃ ┗ 📜 main.yml
-  ┣ 📂 files
- ┃ ┗ 📜 file_placeholder.yml
- ┣ 📂 handlers
  ┃ ┗ 📜 main.yml
  ┣ 📂 meta
  ┃ ┗ 📜 main.yml
@@ -29,8 +28,6 @@ This role includes a full vagrant based molecule testing setup at `extensions/mo
  ┃ ┣ 📜 dependencies.yml
  ┃ ┣ 📜 absent.yml
  ┃ ┗ 📜 init.yml
- ┣ 📂 templates
- ┃ ┗ ⛩️ template.j2
  ┣ 📂 vars
  ┃ ┗ 📜 main.yml
  ┗ 🗒️ README.md
@@ -42,7 +39,7 @@ Describe and explain role structure.
 
 ## Requirements
 
-Ellaborate external dependencies and how to use them.
+This role doesn't depend on any additional ansible-galaxy roles
 
 ## Role Variables
 
@@ -58,7 +55,7 @@ Ellaborate external dependencies and how to use them.
 
 ## Dependencies
 
-List role ansible-galaxy dependencies - if any.
+This role doesn't depend on any additional ansible-galaxy roles
 
 ## Example Playbook
 
@@ -67,18 +64,14 @@ Add an example playbook
 ---
 
 tasks:
-  - name: Include ansible-role-template present
+  - name: Include ansible-vbox-guest present
     ansible.builtin.include_role:
-      name: ansible-role-template
+      name: ansible-vbox-guest
     vars:
-      ansible_role_template_state: present
+      vbox_guest_state: present
 
 ...
 ```
 ## License
 
 Add license - if any.
-
-## Changes to role template
-
-* Add github action that flags empty directories on release creation

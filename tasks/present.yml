@@ -1,11 +1,59 @@
 ---
 
-# tasks to install ansible-role-template
-# INFO larger roles should only use **include_tasks** here
+# tasks to install vbox_guest
 
+- name: Update package cache
+  become: true
+  ansible.builtin.package:
+    update_cache: true
 
-# INFO This task may be osbolete for your use-case
 - name: Gather package facts
   ansible.builtin.package_facts:
+
+- name: Check if VirtualBox Guest Additions kernel module is loaded
+  stat:
+    path: /lib/modules/{{ ansible_kernel }}/misc/vboxguest.ko
+  register: vboxguest_module
+
+- name: Validate VirtualBox Guest Additions installation
+  when: not vboxguest_module.stat.exists
+  block:
+    - name: Include dependencies
+      ansible.builtin.include_tasks:
+        file: dependencies.yml
+
+    - name: Check if the file exists
+      ansible.builtin.stat:
+        path: "{{ vbox_additions_iso_path }}"
+      register: iso_file_stat
+
+    - name: Download guest additions
+      when: not iso_file_stat.stat.exists
+      ansible.builtin.get_url:
+        url: "{{ vbox_guest_download_url }}"
+        dest: "{{ ansible_env.HOME }}"
+        mode: "0644"
+
+    - name: Mount VBoxGuestAdditions.iso
+      become: true
+      ansible.posix.mount:
+        path: /mnt
+        src: "{{ vbox_additions_iso_path }}"
+        fstype: iso9660
+        opts: loop
+        state: mounted
+        fstab: /tmp/tmp.fstab
+
+    # TODO figure out how to run on wrong packaged centos stream9 kernel headers
+    - name: Install VirtualBox Guest Additions
+      become: true
+      ansible.builtin.command: 
+        cmd: "/mnt/VBoxLinuxAdditions.run --nox11"
+      register: guest_add_install
+      failed_when: guest_add_install.rc not in [2, 1, 0]
+
+    - name: Cleanup after installation
+      ansible.builtin.include_tasks:
+        file: present_cleanup.yml
 
 ...

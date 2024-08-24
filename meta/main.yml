@@ -1,7 +1,7 @@
 galaxy_info:
-  role_name: ansible_role_template
-  author: author_name
-  description: ansible-role-template description
+  role_name: vbox_guest
+  author: philnewm
+  description: Install virtualbox guest additions.
 
   license: some_license
 
@@ -11,6 +11,9 @@ galaxy_info:
   - name: EL
     versions:
     - "9"
+  - name: Debian
+    versions:
+      - "bookworm"
 
   galaxy_tags: []
 

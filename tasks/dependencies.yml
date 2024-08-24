@@ -7,4 +7,12 @@
 - name: Gather package facts
   ansible.builtin.package_facts:
 
+- name: Install missing VirtualBox Guest Additions dependencies
+  become: true
+  loop: "{{ vbox_guest_dependencies[ansible_os_family] }}"
+  when: item not in ansible_facts.packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+
 ...

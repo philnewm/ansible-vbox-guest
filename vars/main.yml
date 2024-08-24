@@ -6,4 +6,19 @@
 # remove this placeholder
 ansible_role_template: "Default role name still in use."
 
+vbox_guest_dependencies:
+  "RedHat":
+    - elfutils-libelf-devel
+    - gcc
+    - kernel-devel
+    - kernel-headers
+    - make
+    - perl
+    - binutils
+    - bzip2
+  "Debian":
+    - build-essential
+    - dkms
+    - "linux-headers-{{ ansible_kernel }}"
+
 ...

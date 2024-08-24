@@ -1,0 +1,39 @@
+---
+
+# tasks to cleanup vbox_guest after installation
+
+
+- name: Unmount VBoxGuestAdditions.iso
+  become: true
+  ansible.posix.mount:
+    path: /mnt
+    src: "{{ vbox_additions_iso_path }}"
+    fstype: iso9660
+    opts: loop
+    state: unmounted
+    fstab: /tmp/tmp.fstab
+
+- name: Remove VBoxGuestAdditions.iso
+  ansible.builtin.file:
+    path: "{{ vbox_additions_iso_path }}"
+    state: absent
+
+- name: Remove unused dependencies
+  become: true
+  ansible.builtin.package:
+    autoremove: true
+
+- name: Find /var/log/vboxadd-* logs
+  ansible.builtin.find:
+    paths: /var/log
+    patterns: 'vboxadd-*'
+  register: vboxadd_logs
+
+- name: Delete /var/log/vboxadd-* logs
+  become: true
+  loop: "{{ vboxadd_logs.files }}"
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+
+...

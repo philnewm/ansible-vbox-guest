@@ -3,17 +3,14 @@ dependency:
   name: galaxy
 driver:
   name: vagrant
-  parallel: true
-  provider:
-    name: virtualbox
-    type: virtualbox
 lint: |
   set -e
   yamllint
   ansible-lint
 platforms:
-  - name: Alma9
-    box: almalinux/9
+  - name: Debian12
+    box: debian/bookworm64
+    box_version: "12.20240212.1"
     memory: 2048
     cpus: 2
     interfaces:
