@@ -67,6 +67,10 @@ jobs:
     - name: Verify Vagrant installation
       run: vagrant --version
 
+    - name: Show installed plugins
+      run: |
+        ansible-doc -t callback -l
+
     - name: Run molecule test
       run: |
         molecule test -s test_alma9
