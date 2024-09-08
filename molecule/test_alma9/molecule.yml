@@ -41,7 +41,7 @@ provisioner:
     converge: ../default/converge.yml
     side_effect: ../default/side_effect.yml
     verify: ../default/verify.yml
-    cleanup: ../default/cleanup.yml        
+    cleanup: ../default/cleanup.yml
   config_options:
     defaults:
       diff: True
@@ -49,7 +49,7 @@ provisioner:
       fact_caching_timeout: 3600
       fact_caching: jsonfile
       fact_caching_connection: /tmp/ansible_fact_cache
-      stdout_callback: ansible.posix.debug
+      stdout_callback: debug
       callbacks_enabled: ansible.posix.profile_tasks
     connection:
       pipelining: true
