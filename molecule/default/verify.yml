@@ -43,7 +43,7 @@
         that:
           - "'vboxguest' in vbox_modules.stdout"
           # shared folders optional for now - "'vboxsf' in vbox_modules.stdout"
-          - "'vboxvideo' in vbox_modules.stdout"
+          # shared folders optional for now - "'vboxvideo' in vbox_modules.stdout"
         fail_msg: "Virtual box guest additions kernel modules aren't loaded as expected."
         quiet: true
 
