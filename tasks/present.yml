@@ -2,22 +2,78 @@
 
 # tasks to install vbox_guest
 
-- name: Update package cache
-  become: true
-  ansible.builtin.package:
-    update_cache: true
+# TODO test VBoxClient command
+- name: Check if VirtualBox kernel modules are loaded
+  ansible.builtin.shell:
+    cmd: |
+      set -eo pipefail
+      lsmod | grep -E '^vboxguest|^vboxsf|^vboxvideo'
+    executable: /bin/bash
+  register: vbox_modules
+  changed_when: false
 
-- name: Gather package facts
-  ansible.builtin.package_facts:
+- name: Check vbox guest version
+  ansible.builtin.command:
+    cmd: "VBoxControl --version"
+  register: vbox_version_found
+  changed_when: false
+  failed_when: vbox_version_found.rc not in [0, 2]
 
-- name: Check if VirtualBox Guest Additions kernel module is loaded
-  stat:
-    path: /lib/modules/{{ ansible_kernel }}/misc/vboxguest.ko
-  register: vboxguest_module
+- name: Install guest utils on Ubuntu
+  when: ansible_distribution == "Ubuntu" and vbox_version_found.rc == 2
+  block:
+    - name: Update package cache
+      become: true
+      ansible.builtin.package:
+        update_cache: true
+
+    - name: Install guest utils
+      become: true
+      ansible.builtin.apt:
+        name: virtualbox-guest-utils
+        state: present
+
+    - name: Check vbox guest version
+      ansible.builtin.command:
+        cmd: "VBoxControl --version"
+      register: vbox_version_present
+      changed_when: false
+      failed_when: vbox_version_present.rc != 0
+
+- name: Set fact for installed VirtualBox Guest Additions version
+  when: vbox_version_found.rc == 0
+  ansible.builtin.set_fact:
+    vbox_version_present: "{{ vbox_version_found.stdout | regex_search('^[^_r]+') }}"
+
+# TODO remove debug output
+- name: Show vbox version
+  ansible.builtin.debug:
+    var: vbox_version_present
+
+- name: Set fact if VirtualBox Guest Additions are already installed
+  when: vbox_version_present != vbox_version_target
+  ansible.builtin.set_fact:
+    vbox_version_present: false
+
+- name: Skip VirtualBox Guest Additions installation if already installed
+  when: vbox_version_present
+  ansible.builtin.debug:
+    msg: "VirtualBox Guest Additions Version {{ vbox_version_present }} are already installed."
 
 - name: Validate VirtualBox Guest Additions installation
-  when: not vboxguest_module.stat.exists
+  when: not vbox_version_present
   block:
+    - name: Update package cache
+      become: true
+      ansible.builtin.package:
+        update_cache: true
+
+    - name: Remove virtualbox-guest-utils
+      become: true
+      ansible.builtin.package:
+        name: virtualbox-guest-utils
+        state: absent
+
     - name: Include dependencies
       ansible.builtin.include_tasks:
         file: dependencies.yml
@@ -44,13 +100,41 @@
         state: mounted
         fstab: /tmp/tmp.fstab
 
-    # TODO figure out how to run on wrong packaged centos stream9 kernel headers
     - name: Install VirtualBox Guest Additions
       become: true
-      ansible.builtin.command: 
+      ansible.builtin.command:
         cmd: "/mnt/VBoxLinuxAdditions.run --nox11"
       register: guest_add_install
-      failed_when: guest_add_install.rc not in [2, 1, 0]
+      changed_when: guest_add_install.rc in [0, 2]
+      failed_when: guest_add_install.rc not in [0, 2]
+
+    - name: Reload VirtualBox kernel modules
+      become: true
+      when: guest_add_install.rc == 2
+      ansible.builtin.command:
+        cmd: rcvboxadd reload
+      register: reload_result
+      changed_when: reload_result.rc == 0
+      failed_when: reload_result.rc != 0
+
+    - name: System reboot
+      become: true
+      when: guest_add_install.rc == 2
+      ansible.builtin.reboot:
+        msg: "Rebooting after failing to reload VirtualBox kernel modules"
+
+    - name: Check if VirtualBox Guest Additions modules are loaded
+      ansible.builtin.shell: |
+        lsmod | grep -E 'vboxguest|vboxsf|vboxvideo'
+      register: vbox_modules_loaded
+      failed_when: false
+      changed_when: false
+
+    - name: Load VirtualBox Guest Additions kernel modules if missing
+      become: true
+      when: vbox_modules_loaded.stdout == ''
+      ansible.builtin.command:
+        cmd: modprobe vboxguest && modprobe vboxsf && modprobe vboxvideo
 
     - name: Cleanup after installation
       ansible.builtin.include_tasks:

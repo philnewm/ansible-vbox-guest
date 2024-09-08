@@ -12,42 +12,65 @@
     - name: Gather package facts
       ansible.builtin.package_facts:
 
-    - name: Check VBoxGuestAdditions.iso removed
-      ansible.builtin.stat:
-        path: /home/vagrant/VBoxGuestAdditions.iso
-      register: local_iso
-      failed_when: local_iso.stat.exists
+    - name: Check vbox guest version
+      ansible.builtin.command:
+        cmd: "VBoxControl --version"
+      register: vbox_version_present
+      changed_when: false
+      failed_when: vbox_version_present.rc != 0
 
-    - name: Check /var/log/vboxadd-* logs deleted
-      ansible.builtin.find:
-        paths: /var/log
-        patterns: 'vboxadd-*'
-      register: vboxadd_find
+    - name: Set fact for installed VirtualBox Guest Additions version
+      ansible.builtin.set_fact:
+        vbox_version_installed: "{{ vbox_version_present.stdout | regex_search('^[^_r]+') }}"
 
     - name: Check if VirtualBox kernel modules are loaded
       ansible.builtin.shell:
         cmd: |
           set -eo pipefail
-          lsmod | grep -E '^vboxguest|^vboxsf'
+          lsmod | grep -E '^vboxguest|^vboxsf|^vboxvideo'
         executable: /bin/bash
       register: vbox_modules
       changed_when: false
 
-    # TODO error feedback needs improvement
-    - name: Test cleanup
+    - name: "Test for VBoxGuest Additions version {{ vbox_version_installed }}"
       ansible.builtin.assert:
-        that:
-          - not local_iso.stat.exists
-          - vboxadd_find.matched == 0
-        fail_msg: "Cleanup did either fail at the local iso and/or the logs"
+        that: vbox_version_installed == vbox_version_target
+        fail_msg: "Virtual Box Guest Addtions version vbox_version_target not found, just found: {{ vbox_version_installed }}"
         quiet: true
 
     - name: Test cleanup
       ansible.builtin.assert:
         that:
           - "'vboxguest' in vbox_modules.stdout"
-          - "'vboxsf' in vbox_modules.stdout"
-        fail_msg: "Virtual box guest additions kernel modules aren't loaded."
+          # shared folders optional for now - "'vboxsf' in vbox_modules.stdout"
+          - "'vboxvideo' in vbox_modules.stdout"
+        fail_msg: "Virtual box guest additions kernel modules aren't loaded as expected."
+        quiet: true
+
+    - name: Check VBoxGuestAdditions.iso removed
+      become: true
+      ansible.builtin.stat:
+        path: "{{ vbox_additions_iso_path }}"
+      register: local_iso
+
+    - name: Check /var/log/vboxadd-* logs deleted
+      ansible.builtin.find:
+        paths: "{{ vbox_guest_log_path }}"
+        patterns: 'vboxadd-*'
+      register: vboxadd_find
+
+    - name: Test iso cleanup
+      ansible.builtin.assert:
+        that:
+          - not local_iso.stat.exists
+        fail_msg: "Cleanup failed, local iso still exists at {{ vbox_additions_iso_path }}"
+        quiet: true
+
+    - name: Test cleanup
+      ansible.builtin.assert:
+        that:
+          - vboxadd_find.matched == 0
+        fail_msg: "Cleanup failed, vbox logs are still present, found {{ vboxadd_find.matched }}"
         quiet: true
 
 ...

@@ -13,9 +13,16 @@
     state: unmounted
     fstab: /tmp/tmp.fstab
 
-- name: Remove VBoxGuestAdditions.iso
+- name: remove VBoxGuestAdditions.iso
   ansible.builtin.file:
     path: "{{ vbox_additions_iso_path }}"
+    state: absent
+
+- name: Remove guest utils
+  become: true
+  when: ansible_distribution == "Ubuntu"
+  ansible.builtin.apt:
+    name: virtualbox-guest-utils
     state: absent
 
 - name: Remove unused dependencies

@@ -10,8 +10,8 @@ vbox_guest_dependencies:
   "RedHat":
     - elfutils-libelf-devel
     - gcc
-    - kernel-devel
-    - kernel-headers
+    - kernel-devel-{{ ansible_kernel }}
+    - kernel-headers-{{ ansible_kernel }}
     - make
     - perl
     - binutils
@@ -19,6 +19,6 @@ vbox_guest_dependencies:
   "Debian":
     - build-essential
     - dkms
-    - "linux-headers-{{ ansible_kernel }}"
+    - linux-headers-{{ ansible_kernel }}
 
 ...
