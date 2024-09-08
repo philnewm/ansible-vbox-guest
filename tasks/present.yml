@@ -45,11 +45,6 @@
   ansible.builtin.set_fact:
     vbox_version_present: "{{ vbox_version_found.stdout | regex_search('^[^_r]+') }}"
 
-# TODO remove debug output
-- name: Show vbox version
-  ansible.builtin.debug:
-    var: vbox_version_present
-
 - name: Set fact if VirtualBox Guest Additions are already installed
   when: vbox_version_present != vbox_version_target
   ansible.builtin.set_fact:
