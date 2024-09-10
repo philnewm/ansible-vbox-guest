@@ -8,10 +8,10 @@ ansible_role_template: "Default role name still in use."
 
 vbox_guest_dependencies:
   "RedHat":
-    - elfutils-libelf-devel
-    - gcc
     - kernel-devel-{{ ansible_kernel }}
     - kernel-headers-{{ ansible_kernel }}
+    - elfutils-libelf-devel
+    - gcc
     - make
     - perl
     - binutils

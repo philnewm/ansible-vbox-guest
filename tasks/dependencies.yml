@@ -2,10 +2,12 @@
 
 # Runs all dependencies
 
+- name: Reboot for latest kernel headers + kernel devel
+  become: true
+  ansible.builtin.reboot:
 
-# INFO This task may be osbolete for your use-case
-- name: Gather package facts
-  ansible.builtin.package_facts:
+- name: Re-gather facts
+  ansible.builtin.setup:
 
 - name: Install missing VirtualBox Guest Additions dependencies
   become: true

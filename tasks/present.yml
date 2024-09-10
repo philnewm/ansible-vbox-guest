@@ -2,6 +2,9 @@
 
 # tasks to install vbox_guest
 
+- name: Gather package facts
+  ansible.builtin.package_facts:
+
 # TODO test VBoxClient command
 - name: Check if VirtualBox kernel modules are loaded
   ansible.builtin.shell:
@@ -11,6 +14,7 @@
     executable: /bin/bash
   register: vbox_modules
   changed_when: false
+  failed_when: vbox_modules.rc not in [0, 1]
 
 - name: Check vbox guest version
   ansible.builtin.command:
@@ -58,16 +62,18 @@
 - name: Validate VirtualBox Guest Additions installation
   when: not vbox_version_present
   block:
-    - name: Update package cache
-      become: true
-      ansible.builtin.package:
-        update_cache: true
-
     - name: Remove virtualbox-guest-utils
       become: true
       ansible.builtin.package:
         name: virtualbox-guest-utils
         state: absent
+
+    - name: Update packages
+      become: true
+      ansible.builtin.package:
+        name: "*"
+        state: latest
+        update_cache: true
 
     - name: Include dependencies
       ansible.builtin.include_tasks:
@@ -95,6 +101,7 @@
         state: mounted
         fstab: /tmp/tmp.fstab
 
+    # INFO return code 2 happens on ubuntu even tho installation is successfull
     - name: Install VirtualBox Guest Additions
       become: true
       ansible.builtin.command:
