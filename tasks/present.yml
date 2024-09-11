@@ -101,7 +101,7 @@
         state: mounted
         fstab: /tmp/tmp.fstab
 
-    # INFO return code 2 happens on ubuntu even tho installation is successfull
+    # INFO return code 2 happens on debian based systems even tho installation is successfull
     - name: Install VirtualBox Guest Additions
       become: true
       ansible.builtin.command:
