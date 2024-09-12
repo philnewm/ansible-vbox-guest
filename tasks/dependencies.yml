@@ -2,11 +2,27 @@
 
 # Runs all dependencies
 
+- name: Update package cache
+  become: true
+  ansible.builtin.package:
+    update_cache: true
+
+- name: Install kernel package
+  become: true
+  when: kernel_package[ansible_os_family] not in ansible_facts.packages
+  ansible.builtin.package:
+    name: "{{ kernel_package[ansible_os_family] }}"
+    state: latest
+  register: kernel_install
+
 - name: Reboot for latest kernel headers + kernel devel
+  when: kernel_install.changed
   become: true
   ansible.builtin.reboot:
+  register: reboot_result
 
 - name: Re-gather facts
+  when: reboot_result is not skipped
   ansible.builtin.setup:
 
 - name: Install missing VirtualBox Guest Additions dependencies

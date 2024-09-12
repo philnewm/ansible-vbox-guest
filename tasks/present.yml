@@ -68,13 +68,6 @@
         name: virtualbox-guest-utils
         state: absent
 
-    - name: Update packages
-      become: true
-      ansible.builtin.package:
-        name: "*"
-        state: latest
-        update_cache: true
-
     - name: Include dependencies
       ansible.builtin.include_tasks:
         file: dependencies.yml

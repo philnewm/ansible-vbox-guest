@@ -3,8 +3,9 @@
 # vars file for ansible-role-template
 
 
-# remove this placeholder
-ansible_role_template: "Default role name still in use."
+kernel_package:
+  "RedHat": kernel-{{ ansible_kernel }}
+  "Debian": linux-image-amd64-{{ ansible_kernel }}
 
 vbox_guest_dependencies:
   "RedHat":
