@@ -77,6 +77,7 @@
         path: "{{ vbox_additions_iso_path }}"
       register: iso_file_stat
 
+    # TODO Download on controller and copy over to guest
     - name: Download guest additions
       when: not iso_file_stat.stat.exists
       ansible.builtin.get_url:

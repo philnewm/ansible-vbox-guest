@@ -4,8 +4,8 @@
 
 
 kernel_package:
-  "RedHat": kernel-{{ ansible_kernel }}
-  "Debian": linux-image-amd64-{{ ansible_kernel }}
+  "RedHat": kernel
+  "Debian": linux-image-amd64
 
 vbox_guest_dependencies:
   "RedHat":

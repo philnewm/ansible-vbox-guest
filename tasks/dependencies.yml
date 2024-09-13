@@ -9,7 +9,6 @@
 
 - name: Install kernel package
   become: true
-  when: kernel_package[ansible_os_family] not in ansible_facts.packages
   ansible.builtin.package:
     name: "{{ kernel_package[ansible_os_family] }}"
     state: latest
