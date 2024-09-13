@@ -10,7 +10,7 @@
 - name: Install kernel package
   become: true
   ansible.builtin.package:
-    name: "{{ kernel_package[ansible_os_family] }}"
+    name: "{{ kernel_package[ansible_distribution] }}"
     state: latest
   register: kernel_install
 

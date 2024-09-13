@@ -4,8 +4,11 @@
 
 
 kernel_package:
-  "RedHat": kernel
+  "AlmaLinux": kernel
+  "Rocky": kernel
+  "CentOS": kernel
   "Debian": linux-image-amd64
+  "Ubuntu": linux-image-generic
 
 vbox_guest_dependencies:
   "RedHat":
