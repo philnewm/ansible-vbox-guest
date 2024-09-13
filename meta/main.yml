@@ -3,7 +3,7 @@ galaxy_info:
   author: philnewm
   description: Install virtualbox guest additions.
 
-  license: some_license
+  license: MIT
 
   min_ansible_version: "2.1"
 
@@ -14,6 +14,9 @@ galaxy_info:
   - name: Debian
     versions:
       - "bookworm"
+  - name: Ubuntu
+    versions:
+      - "22.04"
 
   galaxy_tags: []
 
