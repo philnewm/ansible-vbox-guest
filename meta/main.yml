@@ -16,7 +16,7 @@ galaxy_info:
       - "bookworm"
   - name: Ubuntu
     versions:
-      - "22.04"
+      - "jammy"
 
   galaxy_tags: []
 
