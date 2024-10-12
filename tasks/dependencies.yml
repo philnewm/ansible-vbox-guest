@@ -14,7 +14,7 @@
     state: latest
   register: kernel_install
 
-- name: Reboot for latest kernel headers + kernel devel
+- name: Reboot for latest kernel headers + kernel-devel
   when: kernel_install.changed
   become: true
   ansible.builtin.reboot:

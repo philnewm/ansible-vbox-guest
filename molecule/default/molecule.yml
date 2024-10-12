@@ -39,7 +39,6 @@ platforms:
 provisioner:
   name: ansible
   env:
-    # ANSIBLE_VERBOSITY: 3
     ANSIBLE_DIFF_ALWAYS: false
   playbooks:
     create: ../default/create.yml
@@ -62,7 +61,6 @@ provisioner:
       stdout_callback: debug
       callbacks_enabled: ansible.posix.profile_tasks
     connection:
-      # WARNING disable "requiretty" in hosts sudoers file on case of errors
       pipelining: true
     env:
       ANSIBLE_FORCE_COLOR: "true"
@@ -80,3 +78,5 @@ scenario:
       - verify
       - cleanup
       - destroy
+
+...
